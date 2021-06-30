@@ -1,1 +1,3 @@
 # NodeJSBasic
+
+MySQL 활용은 파일 수가 많아서 업로드가 안됨....
