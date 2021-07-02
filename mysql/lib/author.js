@@ -118,3 +118,36 @@ exports.update_process = function(request, response) {
         });
     });
 }
+
+exports.delete_process = function(request, response) {
+    var body = '';
+    request.on('data', function(data) {
+        body = body + data;
+    });
+    request.on('end', function() {
+        var post = qs.parse(body);
+        db.query(`
+            DELETE FROM topic WHERE author_id=?`,
+            // WHERE 절이 없으면 모든 데이터가 삭제되므로 주의
+            // author_id로 작성자 삭제와 함께 그가 쓴 글까지 전부 삭제
+            [post.id], 
+            function(error1, result1) {
+                if(error1) {
+                    throw error1;
+                }
+
+                db.query(`
+                    DELETE FROM author WHERE id=?`, 
+                    [post.id], 
+                    function(error, result) {
+                        if(error) {
+                            throw error;
+                        }
+                        response.writeHead(302, {Location: `/author`});
+                        response.end();
+                    }
+                );
+            }
+        );
+    });
+}
